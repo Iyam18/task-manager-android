@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/navigation_dashboard">
+
+    <fragment
+        android:id="@+id/navigation_dashboard"
+        android:name="com.example.androidmobileapplicationwithrestapiandwebhosting.ui.dashboard.DashboardFragment"
+        android:label="Dashboard"
+        tools:layout="@layout/fragment_dashboard" />
+
+    <fragment
+        android:id="@+id/navigation_tasks"
+        android:name="com.example.androidmobileapplicationwithrestapiandwebhosting.ui.tasks.TaskListFragment"
+        android:label="Tasks"
+        tools:layout="@layout/fragment_task_list" >
+        <action
+            android:id="@+id/action_navigation_tasks_to_navigation_add_task"
+            app:destination="@id/navigation_add_task"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_profile"
+        android:name="com.example.androidmobileapplicationwithrestapiandwebhosting.ui.profile.ProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile" />
+
+    <fragment
+        android:id="@+id/navigation_add_task"
+        android:name="com.example.androidmobileapplicationwithrestapiandwebhosting.ui.tasks.AddEditTaskFragment"
+        android:label="Add Task"
+        tools:layout="@layout/fragment_add_edit_task" >
+        <argument
+            android:name="taskId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+    </fragment>
+</navigation>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="task_status_options">
+        <item>Pending</item>
+        <item>In Progress</item>
+        <item>Completed</item>
+    </string-array>
+    <string-array name="task_priority_options">
+        <item>Low</item>
+        <item>Medium</item>
+        <item>High</item>
+    </string-array>
+</resources>
