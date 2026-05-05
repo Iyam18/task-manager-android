@@ -115,7 +115,7 @@ class ProfileFragment : Fragment() {
         lifecycleScope.launch {
             try {
                 val response = RetrofitClient.instance.getProfile(userId)
-                if (response.isSuccessful) {
+                if (response.isSuccessful && _binding != null) {
                     val user = response.body()?.user
                     user?.let {
                         binding.etUsername.setText(it.username)
@@ -129,7 +129,9 @@ class ProfileFragment : Fragment() {
                     }
                 }
             } catch (e: Exception) {
-                Toast.makeText(context, getString(R.string.msg_profile_load_error), Toast.LENGTH_SHORT).show()
+                if (_binding != null) {
+                    Toast.makeText(context, getString(R.string.msg_profile_load_error), Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
@@ -142,11 +144,13 @@ class ProfileFragment : Fragment() {
             try {
                 val data = mapOf("email" to email, "bio" to bio)
                 val response = RetrofitClient.instance.updateProfile(userId, data)
-                if (response.isSuccessful) {
+                if (response.isSuccessful && _binding != null) {
                     Toast.makeText(context, getString(R.string.msg_profile_update_success), Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                Toast.makeText(context, getString(R.string.msg_profile_update_error), Toast.LENGTH_SHORT).show()
+                if (_binding != null) {
+                    Toast.makeText(context, getString(R.string.msg_profile_update_error), Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
@@ -159,7 +163,7 @@ class ProfileFragment : Fragment() {
         lifecycleScope.launch {
             try {
                 val response = RetrofitClient.instance.uploadProfileImage(userId, body)
-                if (response.isSuccessful) {
+                if (response.isSuccessful && _binding != null) {
                     val newImageUrl = response.body()?.profileImage
                     newImageUrl?.let {
                         val fullUrl = "https://task-manager-backend-qrb6.onrender.com$it"
@@ -168,7 +172,9 @@ class ProfileFragment : Fragment() {
                     Toast.makeText(context, getString(R.string.msg_photo_update_success), Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                Toast.makeText(context, getString(R.string.msg_upload_failed), Toast.LENGTH_SHORT).show()
+                if (_binding != null) {
+                    Toast.makeText(context, getString(R.string.msg_upload_failed), Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
@@ -180,6 +186,8 @@ class ProfileFragment : Fragment() {
             .centerCrop()
             .into(object : CustomTarget<Bitmap>() {
                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    if (_binding == null) return
+                    
                     // Set circle cropped image to ImageView
                     Glide.with(this@ProfileFragment)
                         .load(resource)
@@ -188,6 +196,8 @@ class ProfileFragment : Fragment() {
 
                     // Extract color and update cover
                     Palette.from(resource).generate { palette ->
+                        if (_binding == null) return@generate
+
                         val dominantColor = palette?.getDominantColor(
                             ContextCompat.getColor(requireContext(), R.color.primary)
                         ) ?: ContextCompat.getColor(requireContext(), R.color.primary)

@@ -44,7 +44,7 @@ class DashboardFragment : Fragment() {
         lifecycleScope.launch {
             try {
                 val response = RetrofitClient.instance.getDashboardSummary(userId)
-                if (response.isSuccessful) {
+                if (response.isSuccessful && _binding != null) {
                     val summary = response.body()
                     val total = summary?.get("total") ?: 0
                     val pending = summary?.get("pending") ?: 0
@@ -66,7 +66,9 @@ class DashboardFragment : Fragment() {
                     }
                 }
             } catch (e: Exception) {
-                Toast.makeText(context, getString(R.string.msg_dashboard_load_error), Toast.LENGTH_SHORT).show()
+                if (_binding != null) {
+                    Toast.makeText(context, getString(R.string.msg_dashboard_load_error), Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }

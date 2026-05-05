@@ -128,22 +128,26 @@ class TaskListFragment : Fragment() {
         lifecycleScope.launch {
             try {
                 val response = RetrofitClient.instance.getTasks(userId)
-                binding.progressBar.visibility = View.GONE
-                if (response.isSuccessful) {
-                    allTasks = response.body()?.tasks ?: emptyList()
-                    // Re-apply current filters to the new data
-                    val checkedChipId = binding.chipGroupFilters.checkedChipId
-                    val currentFilter = when (checkedChipId) {
-                        R.id.chipPending -> "Pending"
-                        R.id.chipInProgress -> "In Progress"
-                        R.id.chipCompleted -> "Completed"
-                        else -> "All"
+                if (_binding != null) {
+                    binding.progressBar.visibility = View.GONE
+                    if (response.isSuccessful) {
+                        allTasks = response.body()?.tasks ?: emptyList()
+                        // Re-apply current filters to the new data
+                        val checkedChipId = binding.chipGroupFilters.checkedChipId
+                        val currentFilter = when (checkedChipId) {
+                            R.id.chipPending -> "Pending"
+                            R.id.chipInProgress -> "In Progress"
+                            R.id.chipCompleted -> "Completed"
+                            else -> "All"
+                        }
+                        applyFilters(currentFilter)
                     }
-                    applyFilters(currentFilter)
                 }
             } catch (e: Exception) {
-                binding.progressBar.visibility = View.GONE
-                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                if (_binding != null) {
+                    binding.progressBar.visibility = View.GONE
+                    Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
@@ -152,12 +156,14 @@ class TaskListFragment : Fragment() {
         lifecycleScope.launch {
             try {
                 val response = RetrofitClient.instance.deleteTask(taskId)
-                if (response.isSuccessful) {
+                if (response.isSuccessful && _binding != null) {
                     loadTasks()
                     Toast.makeText(context, "Task deleted", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                Toast.makeText(context, "Delete failed", Toast.LENGTH_SHORT).show()
+                if (_binding != null) {
+                    Toast.makeText(context, "Delete failed", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
