@@ -12,9 +12,16 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.palette.graphics.Palette
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.example.androidmobileapplicationwithrestapiandwebhosting.R
 import com.example.androidmobileapplicationwithrestapiandwebhosting.api.RetrofitClient
 import com.example.androidmobileapplicationwithrestapiandwebhosting.databinding.FragmentProfileBinding
@@ -116,11 +123,8 @@ class ProfileFragment : Fragment() {
                         binding.etBio.setText(it.bio ?: "")
                         
                         if (!it.profileImage.isNullOrEmpty()) {
-                            val imageUrl = "http://10.0.2.2:3000${it.profileImage}"
-                            Glide.with(this@ProfileFragment)
-                                .load(imageUrl)
-                                .circleCrop()
-                                .into(binding.ivProfile)
+                            val imageUrl = "https://task-manager-backend-qrb6.onrender.com${it.profileImage}"
+                            updateProfileImageWithPalette(imageUrl)
                         }
                     }
                 }
@@ -158,10 +162,8 @@ class ProfileFragment : Fragment() {
                 if (response.isSuccessful) {
                     val newImageUrl = response.body()?.profileImage
                     newImageUrl?.let {
-                        Glide.with(this@ProfileFragment)
-                            .load("http://10.0.2.2:3000$it")
-                            .circleCrop()
-                            .into(binding.ivProfile)
+                        val fullUrl = "https://task-manager-backend-qrb6.onrender.com$it"
+                        updateProfileImageWithPalette(fullUrl)
                     }
                     Toast.makeText(context, getString(R.string.msg_photo_update_success), Toast.LENGTH_SHORT).show()
                 }
@@ -169,6 +171,33 @@ class ProfileFragment : Fragment() {
                 Toast.makeText(context, getString(R.string.msg_upload_failed), Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun updateProfileImageWithPalette(url: String) {
+        Glide.with(this)
+            .asBitmap()
+            .load(url)
+            .centerCrop()
+            .into(object : CustomTarget<Bitmap>() {
+                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    // Set circle cropped image to ImageView
+                    Glide.with(this@ProfileFragment)
+                        .load(resource)
+                        .circleCrop()
+                        .into(binding.ivProfile)
+
+                    // Extract color and update cover
+                    Palette.from(resource).generate { palette ->
+                        val dominantColor = palette?.getDominantColor(
+                            ContextCompat.getColor(requireContext(), R.color.primary)
+                        ) ?: ContextCompat.getColor(requireContext(), R.color.primary)
+                        
+                        binding.appBarLayout.setBackgroundColor(dominantColor)
+                    }
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?) {}
+            })
     }
 
     private fun getFileFromUri(uri: Uri): File? {

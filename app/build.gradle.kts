@@ -62,6 +62,7 @@ dependencies {
     // Glide for image loading
     implementation(libs.glide)
     annotationProcessor(libs.glide.compiler)
+    implementation(libs.androidx.palette)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
