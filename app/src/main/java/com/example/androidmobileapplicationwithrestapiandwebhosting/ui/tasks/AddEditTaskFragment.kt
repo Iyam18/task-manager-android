@@ -84,7 +84,7 @@ class AddEditTaskFragment : Fragment() {
         lifecycleScope.launch {
             try {
                 val response = RetrofitClient.instance.getTask(taskId)
-                if (response.isSuccessful) {
+                if (response.isSuccessful && _binding != null) {
                     val task = response.body()?.task
                     task?.let {
                         binding.etTitle.setText(it.title)
@@ -109,7 +109,9 @@ class AddEditTaskFragment : Fragment() {
                     }
                 }
             } catch (e: Exception) {
-                Toast.makeText(context, "Error loading task details", Toast.LENGTH_SHORT).show()
+                if (_binding != null) {
+                    Toast.makeText(context, "Error loading task details", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
@@ -144,15 +146,17 @@ class AddEditTaskFragment : Fragment() {
                     RetrofitClient.instance.createTask(task)
                 }
 
-                if (response.isSuccessful) {
+                if (response.isSuccessful && _binding != null) {
                     val successMsg = if (isEditMode) getString(R.string.msg_task_update_success) else getString(R.string.msg_task_create_success)
                     Toast.makeText(context, successMsg, Toast.LENGTH_SHORT).show()
                     findNavController().navigateUp()
-                } else {
+                } else if (_binding != null) {
                     Toast.makeText(context, "Error: ${response.message()}", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                Toast.makeText(context, getString(R.string.msg_server_error), Toast.LENGTH_SHORT).show()
+                if (_binding != null) {
+                    Toast.makeText(context, getString(R.string.msg_server_error), Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
